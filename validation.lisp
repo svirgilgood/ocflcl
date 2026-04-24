@@ -29,7 +29,7 @@
         for file
         across val
         do (let* ((filepath (pathname (merge-pathnames file path-base)))
-                  (file-hash (utils:hex-of-file :sha512 filepath)))
+                  (file-hash (utils:hex-of-file filepath :digest-algorithm :sha512)))
              (setf (gethash filepath inventory-set) t)
              (unless (string-equal file-hash key)
               (progn
@@ -65,7 +65,7 @@
   (loop
     for inventory-file
     in (directory (merge-pathnames "**/inventory.json" base-dir))
-    do (let ((found-hash (utils:hex-of-file :sha512 inventory-file))
+    do (let ((found-hash (utils:hex-of-file inventory-file :digest-algorithm :sha512))
              (expected-hash (extract-stored-inv-hash inventory-file)))
          (unless (string-equal found-hash expected-hash)
            (progn
