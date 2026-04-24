@@ -5,7 +5,9 @@
 ; - [ ] Address in the user
 ; - [ ] pathnames _must_ be relative
 ; - [ ] type must be an iri
-; - [ ]
+; - [ ] got a heap error while validating b22b9gr8mx0m also: 61001/b2343579qm2c *on* BSD, it works on Linux.
+;
+;
 (ql:quickload '(:com.inuoe.jzon :ironclad))
 (sb-ext:add-package-local-nickname :jzon :com.inuoe.jzon)
 
@@ -39,7 +41,8 @@
 (defun hex-of-file (path)
   (declare (type pathname path))
   "Return the hex string of the file in the path supplied"
-  (ironclad:byte-array-to-hex-string (ironclad:digest-sequence :sha512 (read-file-to-bytes path))))
+  ;(ironclad:byte-array-to-hex-string (ironclad:digest-sequence :sha512 (read-file-to-bytes path))))
+  (ironclad:byte-array-to-hex-string (ironclad:digest-file :sha512 path)))
 
 
 (defun test-hashes (manifest-map  path-base inventory-set &optional (is-valid t))

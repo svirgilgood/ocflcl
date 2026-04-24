@@ -92,7 +92,7 @@
   (clingon:make-command
     :name "validate"
     :description "validate a specific ocfl objects"
-    :version "0.0.3"
+    :version "0.0.4"
     :options (validate/options)
     :handler #'validate/handler))
 
