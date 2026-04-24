@@ -1,7 +1,8 @@
 (in-package :cl)
 
-(defpackage :utilities
-  (:use :cl))
+(defpackage :utils
+  (:use :cl)
+  (:export :if-let :add-default-key :subtract-set :relative-path :hex-of-file))
 
 (defpackage :validation
   (:use :cl)

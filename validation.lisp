@@ -10,40 +10,7 @@
 ;
 (ql:quickload '(:com.inuoe.jzon :ironclad))
 (sb-ext:add-package-local-nickname :jzon :com.inuoe.jzon)
-
-; utility functions
-(defmacro if-let (( var test-form ) then-form &optional else-form)
-  `(let ((,var ,test-form))
-     (if ,var ,then-form ,else-form)))
-
-(defun subtract-set (seta setb)
-  (declare (type hash-table seta)
-           (type hash-table setb))
-  "Takes seta and if the key is not found in setb, a new set is created"
-  (let ((result (make-hash-table :test 'equal)))
-    (loop
-      for key being the hash-keys of seta
-      unless (gethash key setb)
-      do     (setf (gethash key result) t))
-
-    result))
-
-
-(defun read-file-to-bytes (path)
-  (declare (type pathname path))
-  "Read a file path and return an array of bytes from the file"
-  (with-open-file (stream path :direction :input :element-type '(unsigned-byte 8))
-    (let* ((length (file-length stream))
-           (buffer (make-array length :element-type '(unsigned-byte 8))))
-      (read-sequence buffer stream)
-      buffer)))
-
-(defun hex-of-file (path)
-  (declare (type pathname path))
-  "Return the hex string of the file in the path supplied"
-  ;(ironclad:byte-array-to-hex-string (ironclad:digest-sequence :sha512 (read-file-to-bytes path))))
-  (ironclad:byte-array-to-hex-string (ironclad:digest-file :sha512 path)))
-
+(load "utils.lisp")
 
 (defun test-hashes (manifest-map  path-base inventory-set &optional (is-valid t))
   (declare (type hash-table manifest-map)
@@ -62,7 +29,7 @@
         for file
         across val
         do (let* ((filepath (pathname (merge-pathnames file path-base)))
-                  (file-hash (hex-of-file filepath)))
+                  (file-hash (utils:hex-of-file :sha512 filepath)))
              (setf (gethash filepath inventory-set) t)
              (unless (string-equal file-hash key)
               (progn
@@ -98,7 +65,7 @@
   (loop
     for inventory-file
     in (directory (merge-pathnames "**/inventory.json" base-dir))
-    do (let ((found-hash (hex-of-file inventory-file))
+    do (let ((found-hash (utils:hex-of-file :sha512 inventory-file))
              (expected-hash (extract-stored-inv-hash inventory-file)))
          (unless (string-equal found-hash expected-hash)
            (progn
@@ -159,7 +126,7 @@
 ;    (update-file-set file-set base-dir)
 ;    (update-manifest-set manifest-set (merge-pathnames (pathname base-dir) (truename ".")))
 ;    (loop
-;      for key being the hash-keys of (subtract-set file-set manifest-set)
+;      for key being the hash-keys of (utils:subtract-set file-set manifest-set)
 ;      do (format t "unexpected file found: ~A~%" key))))
 
 

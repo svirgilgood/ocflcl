@@ -1,11 +1,7 @@
 (in-package :mutate)
 (ql:quickload '(:com.inuoe.jzon :ironclad :alexandria))
 (sb-ext:add-package-local-nickname :jzon :com.inuoe.jzon)
-
-; utility functions, these need to be pulled into their own package
-(defmacro if-let (( var test-form ) then-form &optional else-form)
-  `(let ((,var ,test-form))
-     (if ,var ,then-form ,else-form)))
+(load "utils.lisp")
 
 (defmacro add-default-key (key new-hash-table old-hash-table)
   (let ((key-string (string-downcase (string key))))
@@ -32,22 +28,6 @@
   "Given a base path, return the relative path of the object as a string"
   (enough-namestring (namestring path) (namestring base)))
 
-
-
-(defun read-file-to-bytes (path)
-  (declare (type pathname path))
-  "Read a file path and return an array of bytes from the file"
-  (with-open-file (stream path :direction :input :element-type '(unsigned-byte 8))
-    (let* ((length (file-length stream))
-           (buffer (make-array length :element-type '(unsigned-byte 8))))
-      (read-sequence buffer stream)
-      buffer)))
-
-(defun hex-of-file (path &key (digest-algorithm :sha512))
-  (declare (type pathname path)
-           (type (or null keyword) digest-algorithm))
-  "Return the hex string of the file in the path supplied"
-  (ironclad:byte-array-to-hex-string (ironclad:digest-sequence digest-algorithm (read-file-to-bytes path))))
 
 (defun get-content-file-name (path)
   (declare (type pathname path))
@@ -81,7 +61,7 @@
       for file in (directory (merge-pathnames "content/**/**.*" version-path))
       with state-hash-table = (make-hash-table :test 'equal)
       when (pathname-name (probe-file file) )
-      do (let ((file-hash (hex-of-file file :digest-algorithm digest-algorithm))
+      do (let ((file-hash (utils:hex-of-file file :digest-algorithm digest-algorithm))
                (file-name (get-content-file-name file))
                (file-relative-path  (merge-pathnames file version-name))
                (file-metadata (make-hash-table :test 'equal)))
@@ -98,7 +78,7 @@
 (defun write-inventory-hash (inventory-path &key ( digest-algorithm :sha512) )
   (declare (type pathname inventory-path)
            (type keyword digest-algorithm))
-  (let* ((hash (hex-of-file inventory-path :digest-algorithm digest-algorithm ))
+  (let* ((hash (utils:hex-of-file inventory-path :digest-algorithm digest-algorithm ))
         (hash-path (pathname (concatenate 'string (namestring inventory-path) "." (string-downcase (string digest-algorithm))))))
     (with-open-file (stream hash-path :direction :output :if-exists :overwrite)
       (format stream "~A inventory.json" hash))))

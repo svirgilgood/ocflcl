@@ -1,5 +1,5 @@
 ; utility functions, these need to be pulled into their own package
-(in-package :utilities)
+(in-package :utils)
 
 
 (defmacro if-let (( var test-form ) then-form &optional else-form)
@@ -46,6 +46,6 @@
   (declare (type pathname path)
            (type (or null keyword) digest-algorithm))
   "Return the hex string of the file in the path supplied"
-  (ironclad:byte-array-to-hex-string (ironclad:digest-sequence digest-algorithm (read-file-to-bytes path))))
+  (ironclad:byte-array-to-hex-string (ironclad:digest-file digest-algorithm path)))
 
 
