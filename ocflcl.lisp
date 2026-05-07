@@ -51,8 +51,16 @@
           (setf (gethash "name" user-hash) user)
           (setf (gethash "address" user-hash) email))
         (setf user-hash nil))
+    (write-line "This is a dangerous operation. Are you sure you wish to proceed?")
+    (write-line "Type 'I solemnly swear that I am up to no good' if you are sure you wish to continue")
+    (if
+        (equal "I solemnly swear that I am up to no good" (read-line))
+        (progn
+          (write-line "Welcome Marauders 🏳️‍⚧️")
+          (mutate:update-object (pathname ocfl) :user user-hash :created created :message message)
+          (write-line "Mischeif managed.")))))
 
-    (mutate:update-object (pathname ocfl) :user user-hash :created created :message message)))
+
     ;(loop
     ;  for ocfl in ocfls
     ;  do (progn

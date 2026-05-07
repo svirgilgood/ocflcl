@@ -5,7 +5,7 @@
 ; - [ ] Address in the user
 ; - [ ] pathnames _must_ be relative
 ; - [ ] type must be an iri
-; - [ ] got a heap error while validating b22b9gr8mx0m also: 61001/b2343579qm2c *on* BSD, it works on Linux.
+; - [x] got a heap error while validating b22b9gr8mx0m also: 61001/b2343579qm2c *on* BSD, it works on Linux. -- fixed by using `digest-file`
 ;
 ;
 (ql:quickload '(:com.inuoe.jzon :ironclad))
